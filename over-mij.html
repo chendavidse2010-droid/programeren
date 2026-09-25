@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>homepage</title>
+</head>
+<body>
+
+    <!-- Header element bovenaan de pagina -->
+    <header>
+        <!-- Nav element met navigatielinks -->
+        <nav>
+            <ul>
+                <li><a href="index.html">meer info over mij</a></li>
+                <li><a href="over-mij.html">homepage</a></li>
+                <!-- Link direct naar de Lorem Ipsum sectie -->
+                <li><a href="#lorem-tekst">extra informatie</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main element om de hoofdinhoud heen -->
+    <main>
+        <!-- Section element binnen main met id-attribuut -->
+        <section id="profiel">
+            <h1>Chen Davidse</h1>
+
+            <!-- Afbeeldingen in een flexbox-container -->
+            <div style="display: flex; gap: 10px;">
+                <img src="images/jerryconfused.jpeg" width="320" height="290" alt="Confused Jerry">
+                <img src="images/shockedcracker.jpeg" width="320" height="360" alt="Shocked Cracker">
+                <img src="images/elmoshocked.jpeg" width="320" height="290" alt="Shocked Elmo">
+            </div>
+
+            <h3>Dingen die ik leuk vind</h3> 
+            <ul>
+                <li><strong>Gamen</strong></li>
+                <li>Slapen</li>
+                <li>Muziek</li>
+            </ul>
+
+            <!-- Hier start de Lorem Ipsum-sectie met het id "lorem-tekst" -->
+            <div id="lorem-tekst">
+                <h3>Extra Informatie</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer element onderaan de pagina -->
+    <footer>
+        <p>&copy; Chen Davidse</p>
+    </footer>
+
+</body>
+</html>
