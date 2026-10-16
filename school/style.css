@@ -1,0 +1,266 @@
+/* Zet dit bovenaan je style.css */
+html {
+    background-color: #121212; /* Donkere achtergrondkleur voorkomt de witte flits */
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #121212; /* Match met de html achtergrond */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+
+    text-align: center;
+
+    background-image: url("images/coding.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: 75% center;
+
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* ========================================== */
+/* STYLING VOOR DE NAVIGATIEBALK */
+/* ========================================== */
+
+/* Basisstijl van de navigatiebalk */
+nav {
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Verwijder stippen en zet lijstitems naast elkaar */
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Maak van elk lijstitem en link een net blokje */
+nav li {
+    margin: 0;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    display: inline-block; /* Voorkomt overlap met andere regels */
+    transition: background-color 0.3s ease;
+}
+
+/* Het blokje op de actieve pagina */
+nav a.active {
+    background-color: #434343;
+    font-weight: bold;
+}
+
+/* Hover-effect voor overige links */
+nav a:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+/* ========================================== */
+
+/* Het donkere half-transparante vak rondom je content */
+main {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+/* Kleur op het h1-element */
+h1 {
+    color: #858585;
+}
+
+/* Stijlregel voor de class intro */
+.intro {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f1f1f;
+    background-color: #cecece;
+    padding: 10px;
+    border-radius: 5px;
+}
+/* Pijltje VÓÓR de tekst */
+nav a.scroll-link::before {
+    content: "↓ ";
+    font-size: 0.8em;
+}
+
+/* Pijltje ACHTER de tekst */
+nav a.scroll-link::after {
+    content: " ↓";
+    font-size: 0.8em;
+}
+/* Zorgt voor een vloeiende scroll-beweging naar boven */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Stijl voor de terug naar boven-knop */
+.back-to-top {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px 15px;
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.back-to-top:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+/* Animatie 1: Komt van links */
+@keyframes slideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animatie 2: Komt van rechts */
+@keyframes slideFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Pas de animatie toe op basis van de class op de body */
+body.slide-left {
+    animation: slideFromLeft 0.5s ease-out;
+}
+
+body.slide-right {
+    animation: slideFromRight 0.5s ease-out;
+}
+.counter-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+}
+
+.counter-container h3 {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+#click-btn {
+    background-color: #484848;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease;
+    margin-bottom: 10px;
+}
+
+#click-btn:hover {
+    background-color: #5d5d5d;
+}
+
+#click-btn:active {
+    transform: scale(0.95); /* Doet de knop heel even inkrimpen als je klikt */
+}
+/* Zorg dat lijsten netjes links uitgelijnd zijn voor de tekst, maar het blok zelf in het midden staat */
+ul,
+ol {
+    display: inline-block;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px; /* Zorgt dat de bolletjes netjes binnen het blok vallen */
+}
+.image-container {
+    display: flex;
+    justify-content: center; /* Centreert de afbeeldingen horizontaal in het midden */
+    gap: 10px; /* Houdt de ruimte tussen de katten netjes */
+    margin: 20px auto; /* Zorgt voor wat ruimte boven/onder en centreert het blok */
+}
+.game-container {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px auto;
+    max-width: 350px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+#snakeCanvas {
+    background-color: #121212;
+    border: 2px solid #4da6ff;
+    border-radius: 0px;
+    display: block;
+    margin: 10px auto;
+}
+
+#snake-score {
+    font-weight: bold;
+    color: #4da6ff;
+}
+body {
+    /* Vervang 'images/cursor.png' door jouw eigen bestandstip */
+    cursor: url("images/cursor.cur"), auto;
+}
+/* --- GRAPPLING HOOK MODE STYLING --- */
+#grappler-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* Zorgt dat je nog wel door het canvas heen kunt klikken op de normale pagina */
+    z-index: 9999;
+}
+
+.graple-target-highlight {
+    outline: 2px dashed #4da6ff !important;
+    background-color: rgba(77, 166, 255, 0.1) !important;
+}
+.tekst-rij {
+    display: flex; /* Zet de elementen automatisch naast elkaar */
+    gap: 20px; /* Bepaalt de ruimte tussen de blokken */
+    justify-content: center; /* Centreert de blokken horizontaal */
+    flex-wrap: wrap; /* Zorgt ervoor dat ze op kleine schermen (zoals mobiel) wel netjes onder elkaar springen */
+}
+
+.tekst-kolom {
+    flex: 1; /* Zorgt dat ze even breed worden verdeeld */
+    min-width: 250px; /* Voorkomt dat ze te smal worden op kleine schermen */
+}

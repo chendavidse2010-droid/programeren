@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEON ARENA | AI Showdown</title>
+<style>
+*{box-sizing:border-box}
+:root{--cyan:#5df6ff;--pink:#ff48c9;--bg:#070a16}
+body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Arial;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;cursor:crosshair}
+#hud{position:fixed;inset:0;pointer-events:none;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.panel{background:#0a1024dd;border:1px solid #5df6ff40;border-radius:12px;padding:10px 14px;backdrop-filter:blur(8px)}
+.logo{font-size:22px;font-weight:1000;letter-spacing:3px;color:var(--cyan)}
+.logo span{color:var(--pink)}
+.label{font-size:10px;letter-spacing:2px;color:#92a9c8;text-transform:uppercase}
+.number{font-size:20px;font-weight:900}
+.stats{display:flex;gap:7px}
+.bar{height:8px;background:#263047;border-radius:9px;overflow:hidden;margin-top:6px}
+.bar div{height:100%;background:linear-gradient(90deg,var(--cyan),#85ffb8);width:100%;transition:width .1s}
+#boost{background:linear-gradient(90deg,#9d6cff,var(--pink))}
+.bottom{display:flex;justify-content:space-between;align-items:end;gap:10px}
+.hint{font-size:11px;color:#c1d0e5;line-height:1.8}
+kbd{border:1px solid #526681;border-bottom-width:3px;border-radius:4px;padding:1px 5px;color:white}
+.overlay{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:18px;background:#030611d9;overflow:auto}
+.card{width:min(600px,100%);padding:clamp(22px,5vw,42px);border:1px solid #5df6ff65;border-radius:22px;background:linear-gradient(145deg,#141d36,#080c1a);box-shadow:0 0 80px #00ddff15}
+.kicker{font-size:11px;font-weight:900;letter-spacing:4px;color:var(--pink)}
+h1{font-size:clamp(38px,9vw,70px);line-height:.9;letter-spacing:-3px;margin:16px 0}
+h1 span{color:var(--cyan);text-shadow:0 0 25px #5df6ff40}
+p{color:#b6c6de;line-height:1.65}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
+.features div{background:#ffffff08;border:1px solid #ffffff12;padding:11px;border-radius:10px}
+.features b{display:block;font-size:12px}
+.features small{color:#93a9c7}
+button{width:100%;padding:15px;border:0;border-radius:10px;background:linear-gradient(90deg,var(--cyan),#a1ffea);color:#07101a;font-weight:1000;letter-spacing:2px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+.note{text-align:center;color:#8095b3;font-size:11px}
+#toast{position:fixed;z-index:2;top:24%;width:100%;text-align:center;font-size:clamp(24px,5vw,48px);font-weight:1000;letter-spacing:5px;color:white;text-shadow:0 0 25px var(--cyan);pointer-events:none;opacity:0;transition:opacity .2s}
+#pauseBtn{position:fixed;right:16px;bottom:100px;pointer-events:auto;width:auto;padding:9px 12px;background:#111c33;color:white;border:1px solid #5df6ff55;display:none}
+#touch{position:fixed;bottom:20px;left:18px;right:18px;display:none;justify-content:space-between;pointer-events:none}
+.touchbtn{pointer-events:auto;border:1px solid #5df6ff80;background:#071426bb;color:var(--cyan);border-radius:50%;width:65px;height:65px;font-size:12px;font-weight:900;touch-action:none}
+@media(max-width:650px){#hud{padding:10px}.logo{font-size:17px}.panel{padding:8px}.stats{gap:4px}.stats .panel{padding:7px}.number{font-size:15px}.hint{font-size:9px}.bottom .panel:last-child{display:none}#touch{display:flex}canvas{cursor:default}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+ <div class="row">
+  <div>
+   <div class="logo">NEON <span>ARENA</span></div>
+   <div class="label">AI combat simulator</div>
+   <div class="panel" style="margin-top:10px;width:190px">
+    <div class="label">Schild / levens</div><div class="bar"><div id="hp"></div></div>
+    <div class="label" style="margin-top:9px">Impulsboost</div><div class="bar"><div id="boost"></div></div>
+   </div>
+  </div>
+  <div class="stats">
+   <div class="panel"><div class="label">Score</div><div class="number" id="score">000000</div></div>
+   <div class="panel"><div class="label">Golf</div><div class="number" id="wave">01</div></div>
+   <div class="panel"><div class="label">Kills</div><div class="number" id="kills">00</div></div>
+  </div>
+ </div>
+ <div class="bottom">
+  <div class="panel hint"><b>BESTURING</b><br><kbd>WASD</kbd> bewegen · <kbd>MUIS</kbd> richten<br><kbd>KLIK</kbd> schieten · <kbd>SPATIE</kbd> boost · <kbd>P</kbd> pauze</div>
+  <div class="panel"><div class="label">Systeem</div><div class="number" id="status" style="color:var(--cyan)">ONLINE</div></div>
+ </div>
+</div>
+<div id="toast"></div>
+<button id="pauseBtn">PAUZE</button>
+<div id="touch">
+ <button class="touchbtn" id="fire">VUUR</button>
+ <button class="touchbtn" id="dash">BOOST</button>
+</div>
+<div class="overlay" id="menu">
+ <div class="card">
+  <div class="kicker">AUTONOME GEVECHTSSIMULATIE</div>
+  <h1>NEON<br><span>ARENA</span></h1>
+  <p>Jij tegen de machine. Vecht tegen agressieve AI-jagers en snelle flankers. Overleef de golven, verzamel herstelkernen en bouw je score op. Elke nieuwe golf brengt meer vijanden en snellere aanvallen.</p>
+  <div class="features">
+   <div><b>AI-VIJANDEN</b><small>Jagen & flankeren</small></div>
+   <div><b>UPGRADES</b><small>Elke golf sterker</small></div>
+   <div><b>BOOST</b><small>Ontwijk aanvallen</small></div>
+  </div>
+  <button id="start">START GEVECHT →</button>
+  <p class="note">Pro-tip: blijf bewegen. De vijand is niet gekomen om gezellig te praten.</p>
+ </div>
+</div>
+<div class="overlay" id="end" style="display:none">
+ <div class="card">
+  <div class="kicker">SIMULATIE AFGEROND</div>
+  <h1 id="endtitle">GAME<br><span>OVER</span></h1>
+  <p id="endmsg">De AI heeft de arena overgenomen.</p>
+  <div class="features">
+   <div><b id="fs">0</b><small>Score</small></div>
+   <div><b id="fw">1</b><small>Golf</small></div>
+   <div><b id="fk">0</b><small>Uitschakelingen</small></div>
+  </div>
+  <button id="again">OPNIEUW SPELEN ↻</button>
+ </div>
+</div>
+<script>
+(()=>{
+const C=document.querySelector('#game'),ctx=C.getContext('2d');
+const $=id=>document.getElementById(id);
+let W,H,D=1;
+function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;ctx.setTransform(D,0,0,D,0,0)}
+addEventListener('resize',resize);resize();
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const keys={};const mouse={x:W/2,y:H/2,down:false};
+let player,enemies=[],bullets=[],particles=[],drops=[],stars=[];
+let active=false,paused=false,dead=false,score=0,kills=0,wave=1,time=0,spawn=0,last=0;
+function key(e,on){
+ let k=e.key.toLowerCase();keys[k]=on;
+ if(on&&[' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
+ if(on&&k==='p'&&active&&!dead)togglePause();
+ if(on&&k===' '&&active&&!paused)dash();
+}
+addEventListener('keydown',e=>key(e,true));addEventListener('keyup',e=>key(e,false));
+C.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+C.addEventListener('mousedown',()=>mouse.down=true);
+addEventListener('mouseup',()=>mouse.down=false);
+C.addEventListener('touchmove',e=>{if(e.touches[0]){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY}},{passive:true});
+C.addEventListener('touchstart',e=>{if(e.touches[0]){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;mouse.down=true}},{passive:true});
+C.addEventListener('touchend',()=>mouse.down=false);
+$('fire').onpointerdown=e=>{e.preventDefault();mouse.down=true};
+$('fire').onpointerup=()=>mouse.down=false;
+$('dash').onpointerdown=e=>{e.preventDefault();dash()};
+function togglePause(){paused=!paused;$('status').textContent=paused?'PAUZE':'ONLINE';$('pauseBtn').textContent=paused?'HERVAT':'PAUZE'}
+$('pauseBtn').onclick=togglePause;
+function toast(t){$('toast').textContent=t;$('toast').style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').style.opacity=0,1300)}
+function burst(x,y,color,n=10,power=150){for(let i=0;i<n;i++){let a=rnd(0,Math.PI*2),s=rnd(power*.2,power);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rnd(.2,.7),max:.7,r:rnd(1,3),color})}}
+function shoot(owner,x,y,a,speed,damage,color){bullets.push({owner,x:x+Math.cos(a)*15,y:y+Math.sin(a)*15,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:1.7,damage,color,r:3})}
+function enemy(initial=false){
+ let side=Math.floor(Math.random()*4),x=side===0?-15:side===1?W+15:rnd(10,W-10),y=side===2?-15:side===3?H+15:rnd(10,H-10);
+ if(initial){x=rnd(30,W-30);y=rnd(30,H-30);if(Math.hypot(x-player.x,y-player.y)<160){x=W-x;y=H-y}}
+ let type=Math.random()<Math.min(.22+wave*.018,.45)?'flanker':'hunter';
+ let hp=type==='flanker'?2:3;
+ enemies.push({x,y,vx:0,vy:0,r:type==='flanker'?10:13,hp,max:hp,type,speed:rnd(65,90)+wave*3,fire:rnd(.5,1.7),think:rnd(.4,1.4),side:Math.random()<.5?-1:1,hit:0});
+}
+function reset(){
+ score=0;kills=0;wave=1;time=0;spawn=0;enemies=[];bullets=[];particles=[];drops=[];
+ player={x:W/2,y:H/2,vx:0,vy:0,r:12,hp:100,angle:0,fire:0,cd:0,inv:1};
+ active=true;paused=false;dead=false;
+ $('menu').style.display='none';$('end').style.display='none';$('pauseBtn').style.display='block';
+ $('status').textContent='ONLINE';$('status').style.color='#5df6ff';
+ for(let i=0;i<4;i++)enemy(true);
+ toast('GOLF 1');last=performance.now();
+}
+function dash(){
+ if(!active||paused||dead||!player||player.cd>0)return;
+ let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
+ let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+ if(!x&&!y){x=Math.cos(player.angle);y=Math.sin(player.angle)}
+ let m=Math.hypot(x,y)||1;
+ player.vx+=x/m*530;player.vy+=y/m*530;player.cd=2;player.inv=.3;
+ burst(player.x,player.y,'#5df6ff',16,210);
+}
+function update(dt){
+ time+=dt;
+ let p=player;
+ p.fire-=dt;p.cd=Math.max(0,p.cd-dt);p.inv=Math.max(0,p.inv-dt);
+ let dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
+ let dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+ let m=Math.hypot(dx,dy)||1;
+ p.vx+=dx/m*560*dt*(dx||dy?1:0);p.vy+=dy/m*560*dt*(dx||dy?1:0);
+ p.vx*=Math.pow(.86,dt*60);p.vy*=Math.pow(.86,dt*60);
+ let speed=Math.hypot(p.vx,p.vy),max=p.cd>1.75?650:280;
+ if(speed>max){p.vx*=max/speed;p.vy*=max/speed}
+ p.x=clamp(p.x+p.vx*dt,15,W-15);p.y=clamp(p.y+p.vy*dt,15,H-15);
+ p.angle=Math.atan2(mouse.y-p.y,mouse.x-p.x);
+ if(mouse.down&&p.fire<=0){shoot('p',p.x,p.y,p.angle,700,1,'#5df6ff');p.fire=.12;burst(p.x+Math.cos(p.angle)*15,p.y+Math.sin(p.angle)*15,'#5df6ff',2,40)}
+ spawn-=dt;if(spawn<=0){if(enemies.length<Math.min(5+wave*2,30))enemy();spawn=Math.max(.25,1.1-wave*.045)}
+ for(let i=enemies.length-1;i>=0;i--){
+  let e=enemies[i],tx=p.x-e.x,ty=p.y-e.y,d=Math.hypot(tx,ty)||1,ux=tx/d,uy=ty/d;
+  e.fire-=dt;e.think-=dt;e.hit=Math.max(0,e.hit-dt);
+  if(e.think<=0){e.side=Math.random()<.5?-1:1;e.think=rnd(.5,1.4)}
+  let desired=e.type==='flanker'?(d>260?1:d<170?-1:0):(d>210?1:d<120?-.8:.2);
+  let strafe=e.type==='flanker'?1:.35;
+  e.vx=(e.vx+(ux*desired-uy*e.side*strafe)*e.speed*2.5*dt)*Math.pow(.91,dt*60);
+  e.vy=(e.vy+(uy*desired+ux*e.side*strafe)*e.speed*2.5*dt)*Math.pow(.91,dt*60);
+  let es=Math.hypot(e.vx,e.vy),em=e.speed*1.5;
+  if(es>em){e.vx=e.vx/es*em;e.vy=e.vy/es*em}
+  e.x+=e.vx*dt;e.y+=e.vy*dt;
+  if(e.fire<=0&&d<600){let lead=d/420,a=Math.atan2(ty+p.vy*lead,tx+p.vx*lead)+rnd(-.12,.12);shoot('e',e.x,e.y,a,280+wave*5,9,e.type==='flanker'?'#ff48c9':'#ff795e');e.fire=rnd(.85,1.5)*Math.max(.55,1-wave*.025)}
+  if(d<e.r+p.r&&p.inv<=0){p.hp-=65*dt;p.vx-=ux*180*dt;p.vy-=uy*180*dt}
+ }
+ for(let i=bullets.length-1;i>=0;i--){
+  let b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
+  let remove=b.life<=0||b.x<-30||b.x>W+30||b.y<-30||b.y>H+30;
+  if(!remove&&b.owner==='p'){
+   for(let j=enemies.length-1;j>=0;j--){let e=enemies[j];
+    if(Math.hypot(b.x-e.x,b.y-e.y)<e.r+b.r){
+     e.hp-=b.damage;e.hit=.1;burst(b.x,b.y,e.type==='flanker'?'#ff48c9':'#ff795e',4,65);remove=true;
+     if(e.hp<=0){kills++;score+=e.type==='flanker'?150:100;burst(e.x,e.y,e.type==='flanker'?'#ff48c9':'#ff795e',18,180);if(Math.random()<.13)drops.push({x:e.x,y:e.y,life:10});enemies.splice(j,1)}
+     break;
+    }
+   }
+  }else if(!remove&&b.owner==='e'&&Math.hypot(b.x-p.x,b.y-p.y)<p.r+b.r&&p.inv<=0){p.hp-=b.damage;p.inv=.15;burst(b.x,b.y,'#ff48c9',5,80);remove=true}
+  if(remove)bullets.splice(i,1);
+ }
+ for(let i=drops.length-1;i>=0;i--){let d=drops[i];d.life-=dt;if(Math.hypot(d.x-p.x,d.y-p.y)<p.r+10){p.hp=Math.min(100,p.hp+22);score+=25;burst(d.x,d.y,'#85ffb8',12,100);drops.splice(i,1)}else if(d.life<=0)drops.splice(i,1)}
+ for(let i=particles.length-1;i>=0;i--){let b=particles[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.vx*=Math.pow(.94,dt*60);b.vy*=Math.pow(.94,dt*60);b.life-=dt;if(b.life<=0)particles.splice(i,1)}
+ if(kills>=wave*8){wave++;p.hp=Math.min(100,p.hp+12);toast('GOLF '+wave+' · REPARATIE +12');for(let i=0;i<Math.min(2+Math.floor(wave/2),5);i++)enemy(true)}
+ if(p.hp<=0)gameover();
+ $('hp').style.width=clamp(p.hp,0,100)+'%';$('boost').style.width=(100-p.cd/2*100)+'%';
+ $('score').textContent=String(score).padStart(6,'0');$('wave').textContent=String(wave).padStart(2,'0');$('kills').textContent=String(kills).padStart(2,'0');
+}
+function gameover(){
+ active=false;dead=true;$('pauseBtn').style.display='none';$('status').textContent='OFFLINE';$('status').style.color='#ff48c9';
+ $('fs').textContent=score;$('fw').textContent=wave;$('fk').textContent=kills;
+ $('endtitle').innerHTML=score>=5000?'ARENA<br><span>LEGENDE</span>':'GAME<br><span>OVER</span>';
+ $('endmsg').textContent=score>=5000?'Je hebt de arena gedomineerd. De AI wil een herkansing.':'De AI heeft deze ronde gewonnen. Volgende keer: bewegen, richten, overleven.';
+ $('end').style.display='grid';
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#070a16';ctx.fillRect(0,0,W,H);
+ let g=ctx.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H)*.7);g.addColorStop(0,'#141e36');g.addColorStop(1,'#050711');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#6ed9ff0c';ctx.lineWidth=1;let gap=46,off=time*9%gap;
+ for(let x=-gap+off;x<W;x+=gap){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+ for(let y=-gap+off;y<H;y+=gap){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ for(let i=0;i<100;i++){let x=(i*173)%W,y=(i*293)%H;ctx.fillStyle='#8ebce0';ctx.globalAlpha=.2+.2*Math.sin(time+i);ctx.fillRect(x,y,1.5,1.5)}ctx.globalAlpha=1;
+ for(let d of drops){ctx.save();ctx.translate(d.x,d.y);ctx.rotate(time*2);ctx.strokeStyle='#85ffb8';ctx.shadowColor='#85ffb8';ctx.shadowBlur=16;ctx.strokeRect(-8,-8,16,16);ctx.restore()}
+ for(let b of bullets){ctx.strokeStyle=b.color;ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor=b.color;ctx.beginPath();ctx.moveTo(b.x-b.vx*.025,b.y-b.vy*.025);ctx.lineTo(b.x,b.y);ctx.stroke()}ctx.shadowBlur=0;
+ for(let e of enemies){
+  let a=Math.atan2(player.y-e.y,player.x-e.x);ctx.save();ctx.translate(e.x,e.y);ctx.rotate(a);
+  ctx.fillStyle=e.hit?'white':e.type==='flanker'?'#ff48c9':'#ff795e';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=17;
+  ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-9,-9);ctx.lineTo(-5,0);ctx.lineTo(-9,9);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.fillStyle='#ffffff24';ctx.fillRect(e.x-13,e.y-e.r-9,26,3);ctx.fillStyle=e.type==='flanker'?'#ff48c9':'#ff795e';ctx.fillRect(e.x-13,e.y-e.r-9,26*e.hp/e.max,3);
+ }
+ if(player){
+  let p=player;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.globalAlpha=p.inv>0&&Math.floor(time*30)%2===0?.45:1;
+  ctx.shadowBlur=22;ctx.shadowColor='#5df6ff';ctx.fillStyle='#5df6ff';ctx.strokeStyle='#e3ffff';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-11,-10);ctx.lineTo(-6,0);ctx.lineTo(-11,10);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#ff48c9';ctx.beginPath();ctx.moveTo(-8,-4);ctx.lineTo(-rnd(13,24),0);ctx.lineTo(-8,4);ctx.fill();ctx.restore();
+  ctx.strokeStyle='#5df6ff55';ctx.beginPath();ctx.arc(p.x,p.y,20+Math.sin(time*5)*2,0,Math.PI*2);ctx.stroke();
+ }
+ for(let p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.shadowBlur=8;ctx.shadowColor=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;ctx.shadowBlur=0;
+ if(paused&&active){ctx.fillStyle='#02040ac9';ctx.fillRect(0,0,W,H);ctx.fillStyle='white';ctx.textAlign='center';ctx.font='900 38px system-ui';ctx.fillText('GEPAUZEERD',W/2,H/2);ctx.font='14px system-ui';ctx.fillText('Druk op P om door te gaan',W/2,H/2+30)}
+}
+function loop(t){let dt=Math.min((t-last)/1000||0,.033);last=t;if(active&&!paused)update(dt);else time+=dt*.3;draw();requestAnimationFrame(loop)}
+$('start').onclick=reset;$('again').onclick=reset;
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
