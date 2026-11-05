@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reboot Repaircafé - Afspraak Maken</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="./afbeeldingen/tablad-logo.png">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <img src="./afbeeldingen/logo.svg" alt="Reboot Repaircafé Logo">
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="reparaties.html">Reparaties</a>
+                <a href="afspraak.html" class="actief">Afspraak</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="paginatitel">
+            <div class="container">
+                <h1>Maak een afspraak</h1>
+                <p>Vul het formulier in en Alexander neemt binnen één werkdag contact met je op.</p>
+            </div>
+        </section>
+
+        <section id="formulier-sectie">
+            <div class="container">
+                <div class="kaart">
+                    <h2>Aanvraagformulier</h2>
+                    <form action="#" method="POST">
+                        <div>
+                            <label for="naam">Naam</label>
+                            <input type="text" id="naam" name="naam" required>
+                        </div>
+
+                        <div>
+                            <label for="email">E-mailadres</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div>
+                            <label for="apparaat">Welk apparaat?</label>
+                            <input type="text" id="apparaat" name="apparaat" required>
+                        </div>
+
+                        <div>
+                            <label for="kapot">Wat is er kapot?</label>
+                            <textarea id="kapot" name="kapot" rows="5" required></textarea>
+                        </div>
+
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="akkoord" name="akkoord" required>
+                            <label for="akkoord" style="font-weight: normal;">Ik ga akkoord dat Reboot mijn gegevens gebruikt om contact met mij op te nemen.</label>
+                        </div>
+
+                        <button type="submit" class="knop">Verstuur aanvraag</button>
+                    </form>
+                </div>
+
+                <div class="kaart">
+                    <h2>Liever langskomen of bellen?</h2>
+                    <p><strong>Adres:</strong> Molenstraat 12, 4701 Roosendaal</p>
+                    <p><strong>Telefoon:</strong> 0165 - 123 456</p>
+                    <p><strong>E-mail:</strong> <a href="mailto:alexander@reboot-repaircafe.nl" style="color: #1F4D3A; font-weight: bold;">alexander@reboot-repaircafe.nl</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><strong>Reboot Repaircafé</strong> &middot; Molenstraat 12, 4701 Roosendaal &middot; 0165 - 123 456</p>
+            <p>&copy; 2026 Reboot Repaircafé - repareren in plaats van weggooien</p>
+        </div>
+    </footer>
+
+</body>
+</html>
